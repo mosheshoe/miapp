@@ -1,27 +1,25 @@
 # DevScope
 
-DevScope es una aplicación web que analiza perfiles públicos de GitHub.
+DevScope es una aplicación web profesional que simula el análisis de perfiles de GitHub.
 
-## Funciones principales
+## Funciones
 
-- Búsqueda de usuarios de GitHub.
-- Información general del perfil.
-- Total de repositorios públicos.
+- Búsqueda de usuarios.
+- Indicadores KPI.
+- Total de repositorios.
 - Total de estrellas.
 - Total de forks.
-- Promedio de estrellas por repositorio.
-- Lenguaje más utilizado.
+- Promedio de estrellas.
+- Lenguaje principal.
 - Repositorio más popular.
 - Lista de repositorios destacados.
-- Diseño responsive para computadora y celular.
+- Ventanas con detalles.
+- Diseño responsive.
+- Botones funcionales.
 
-## KPI principal
+## Cómo probarla
 
-El KPI principal es el total de estrellas recibidas en todos los repositorios públicos.
+Escribe uno de estos usuarios:
 
-```javascript
-const totalStars = repositories.reduce(
-    (total, repository) =>
-        total + repository.stargazers_count,
-    0
-);
+```text
+octocat
