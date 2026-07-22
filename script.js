@@ -1,40 +1,571 @@
 const form = document.getElementById("github-form");
 const usernameInput = document.getElementById("username");
-const searchButton = document.getElementById("search-button");
-const buttonText = document.getElementById("button-text");
+const analyzeButton = document.getElementById("analyze-button");
 
 const statusMessage = document.getElementById("status-message");
 const loadingSection = document.getElementById("loading-section");
 const resultsSection = document.getElementById("resultados");
 
-form.addEventListener("submit", async (event) => {
+const newSearchButton = document.getElementById(
+    "new-search-button"
+);
+
+const repositoryButton = document.getElementById(
+    "repository-button"
+);
+
+const modal = document.getElementById("modal");
+
+const closeModalButton = document.getElementById(
+    "close-modal-button"
+);
+
+const demoProfiles = {
+    octocat: {
+        name: "The Octocat",
+        username: "octocat",
+        description:
+            "Perfil de demostración utilizado para probar aplicaciones conectadas con GitHub.",
+        repositories: [
+            {
+                name: "Hello-World",
+                description:
+                    "Repositorio de demostración para aprender los conceptos básicos de GitHub.",
+                language: "JavaScript",
+                stars: 128,
+                forks: 42
+            },
+            {
+                name: "Spoon-Knife",
+                description:
+                    "Proyecto utilizado para practicar forks, cambios y colaboraciones.",
+                language: "HTML",
+                stars: 97,
+                forks: 35
+            },
+            {
+                name: "GitHub-Guide",
+                description:
+                    "Guía sencilla para comenzar a trabajar con repositorios.",
+                language: "CSS",
+                stars: 64,
+                forks: 18
+            },
+            {
+                name: "Data-Dashboard",
+                description:
+                    "Dashboard de ejemplo para mostrar información y KPIs.",
+                language: "JavaScript",
+                stars: 51,
+                forks: 12
+            },
+            {
+                name: "Portfolio",
+                description:
+                    "Página personal con proyectos y experiencia profesional.",
+                language: "HTML",
+                stars: 34,
+                forks: 7
+            },
+            {
+                name: "API-Practice",
+                description:
+                    "Ejercicios básicos para aprender a trabajar con APIs.",
+                language: "Python",
+                stars: 22,
+                forks: 5
+            }
+        ]
+    },
+
+    microsoft: {
+        name: "Microsoft",
+        username: "microsoft",
+        description:
+            "Organización tecnológica con proyectos de software, nube, inteligencia artificial y herramientas para desarrolladores.",
+        repositories: [
+            {
+                name: "vscode",
+                description:
+                    "Editor de código moderno, rápido y extensible.",
+                language: "TypeScript",
+                stars: 172000,
+                forks: 32100
+            },
+            {
+                name: "TypeScript",
+                description:
+                    "Lenguaje basado en JavaScript que agrega tipos estáticos.",
+                language: "TypeScript",
+                stars: 105000,
+                forks: 12900
+            },
+            {
+                name: "PowerToys",
+                description:
+                    "Conjunto de herramientas para mejorar la productividad en Windows.",
+                language: "C#",
+                stars: 114000,
+                forks: 6900
+            },
+            {
+                name: "terminal",
+                description:
+                    "Terminal moderna para Windows.",
+                language: "C++",
+                stars: 97000,
+                forks: 8500
+            },
+            {
+                name: "playwright",
+                description:
+                    "Herramienta para automatización y pruebas de navegadores.",
+                language: "TypeScript",
+                stars: 72000,
+                forks: 4100
+            },
+            {
+                name: "ML-For-Beginners",
+                description:
+                    "Curso introductorio de machine learning.",
+                language: "Jupyter Notebook",
+                stars: 70000,
+                forks: 15000
+            }
+        ]
+    }
+};
+
+let selectedRepository = null;
+
+form.addEventListener("submit", function (event) {
     event.preventDefault();
 
     const username = usernameInput.value.trim();
 
     if (!username) {
-        showMessage(
-            "Por favor, escribe un usuario de GitHub.",
+        showStatus(
+            "Escribe un usuario antes de continuar.",
             true
         );
+
+        usernameInput.focus();
         return;
     }
 
     startLoading();
 
-    try {
-        const profileResponse = await fetch(
-            `https://api.github.com/users/${encodeURIComponent(username)}`
+    window.setTimeout(function () {
+        const profile = createProfile(username);
+
+        displayProfile(profile);
+
+        stopLoading();
+
+        resultsSection.classList.remove("hidden");
+
+        showStatus(
+            `Análisis completado para @${profile.username}.`
         );
 
-        if (profileResponse.status === 404) {
-            throw new Error(
-                "No encontramos ese usuario de GitHub."
-            );
-        }
+        resultsSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }, 900);
+});
 
-        if (!profileResponse.ok) {
-            throw new Error(
+newSearchButton.addEventListener("click", function () {
+    usernameInput.value = "";
+
+    resultsSection.classList.add("hidden");
+
+    showStatus(
+        "Escribe un nuevo usuario para comenzar."
+    );
+
+    document.getElementById("analizador").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    window.setTimeout(function () {
+        usernameInput.focus();
+    }, 500);
+});
+
+repositoryButton.addEventListener("click", function () {
+    if (selectedRepository) {
+        openRepositoryModal(selectedRepository);
+    }
+});
+
+closeModalButton.addEventListener("click", closeModal);
+
+modal.addEventListener("click", function (event) {
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
+document.addEventListener("keydown", function (event) {
+    if (
+        event.key === "Escape" &&
+        !modal.classList.contains("hidden")
+    ) {
+        closeModal();
+    }
+});
+
+function createProfile(username) {
+    const normalizedUsername = username.toLowerCase();
+
+    if (demoProfiles[normalizedUsername]) {
+        return demoProfiles[normalizedUsername];
+    }
+
+    const seed = calculateSeed(normalizedUsername);
+
+    const languages = [
+        "JavaScript",
+        "Python",
+        "HTML",
+        "TypeScript",
+        "CSS",
+        "Java"
+    ];
+
+    const repositoryNames = [
+        "Portfolio-App",
+        "Data-Dashboard",
+        "Task-Manager",
+        "Analytics-Project",
+        "Web-Application",
+        "Automation-Tools"
+    ];
+
+    const descriptions = [
+        "Aplicación moderna para mostrar proyectos y experiencia.",
+        "Dashboard de datos con indicadores importantes.",
+        "Sistema sencillo para organizar tareas y pendientes.",
+        "Proyecto de análisis y visualización de información.",
+        "Aplicación web responsive creada para practicar desarrollo.",
+        "Herramientas para automatizar tareas repetitivas."
+    ];
+
+    const repositories = repositoryNames.map(
+        function (name, index) {
+            return {
+                name:
+                    normalizedUsername +
+                    "-" +
+                    name.toLowerCase(),
+
+                description: descriptions[index],
+
+                language:
+                    languages[
+                        (seed + index) % languages.length
+                    ],
+
+                stars:
+                    ((seed * (index + 3)) % 95) + 8,
+
+                forks:
+                    ((seed * (index + 2)) % 28) + 2
+            };
+        }
+    );
+
+    return {
+        name: formatUsername(username),
+        username: normalizedUsername,
+        description:
+            "Desarrollador interesado en crear aplicaciones, analizar datos y aprender nuevas tecnologías.",
+        repositories
+    };
+}
+
+function displayProfile(profile) {
+    const analysis = calculateKPIs(profile.repositories);
+
+    document.getElementById(
+        "profile-avatar"
+    ).textContent = getInitials(profile.name);
+
+    document.getElementById(
+        "profile-name"
+    ).textContent = profile.name;
+
+    document.getElementById(
+        "profile-username"
+    ).textContent = `@${profile.username}`;
+
+    document.getElementById(
+        "profile-description"
+    ).textContent = profile.description;
+
+    document.getElementById(
+        "total-repositories"
+    ).textContent = formatNumber(
+        analysis.totalRepositories
+    );
+
+    document.getElementById(
+        "total-stars"
+    ).textContent = formatNumber(
+        analysis.totalStars
+    );
+
+    document.getElementById(
+        "total-forks"
+    ).textContent = formatNumber(
+        analysis.totalForks
+    );
+
+    document.getElementById(
+        "average-stars"
+    ).textContent = analysis.averageStars.toFixed(1);
+
+    document.getElementById(
+        "popular-repository"
+    ).textContent = analysis.popularRepository.name;
+
+    document.getElementById(
+        "popular-description"
+    ).textContent =
+        analysis.popularRepository.description;
+
+    document.getElementById(
+        "main-language"
+    ).textContent = analysis.mainLanguage;
+
+    selectedRepository = analysis.popularRepository;
+
+    displayRepositories(analysis.sortedRepositories);
+}
+
+function calculateKPIs(repositories) {
+    const totalRepositories = repositories.length;
+
+    const totalStars = repositories.reduce(
+        function (total, repository) {
+            return total + repository.stars;
+        },
+        0
+    );
+
+    const totalForks = repositories.reduce(
+        function (total, repository) {
+            return total + repository.forks;
+        },
+        0
+    );
+
+    const averageStars =
+        totalRepositories > 0
+            ? totalStars / totalRepositories
+            : 0;
+
+    const sortedRepositories = [...repositories].sort(
+        function (repositoryA, repositoryB) {
+            return repositoryB.stars - repositoryA.stars;
+        }
+    );
+
+    const popularRepository = sortedRepositories[0];
+
+    const mainLanguage = calculateMainLanguage(
+        repositories
+    );
+
+    return {
+        totalRepositories,
+        totalStars,
+        totalForks,
+        averageStars,
+        popularRepository,
+        mainLanguage,
+        sortedRepositories
+    };
+}
+
+function calculateMainLanguage(repositories) {
+    const languageCount = {};
+
+    repositories.forEach(function (repository) {
+        const language = repository.language;
+
+        languageCount[language] =
+            (languageCount[language] || 0) + 1;
+    });
+
+    const sortedLanguages = Object.entries(
+        languageCount
+    ).sort(function (languageA, languageB) {
+        return languageB[1] - languageA[1];
+    });
+
+    return sortedLanguages[0][0];
+}
+
+function displayRepositories(repositories) {
+    const repositoryList = document.getElementById(
+        "repository-list"
+    );
+
+    repositoryList.innerHTML = "";
+
+    repositories.forEach(function (repository) {
+        const card = document.createElement("article");
+
+        card.className = "repository-card";
+
+        const title = document.createElement("h3");
+        title.textContent = repository.name;
+
+        const description = document.createElement("p");
+        description.className = "repository-description";
+        description.textContent = repository.description;
+
+        const stats = document.createElement("div");
+        stats.className = "repository-stats";
+
+        const language = document.createElement("span");
+        language.textContent = `● ${repository.language}`;
+
+        const stars = document.createElement("span");
+        stars.textContent =
+            `⭐ ${formatNumber(repository.stars)}`;
+
+        const forks = document.createElement("span");
+        forks.textContent =
+            `⑂ ${formatNumber(repository.forks)}`;
+
+        stats.append(language, stars, forks);
+
+        const detailsButton = document.createElement(
+            "button"
+        );
+
+        detailsButton.type = "button";
+        detailsButton.className =
+            "repository-details-button";
+        detailsButton.textContent = "Ver detalles";
+
+        detailsButton.addEventListener(
+            "click",
+            function () {
+                openRepositoryModal(repository);
+            }
+        );
+
+        card.append(
+            title,
+            description,
+            stats,
+            detailsButton
+        );
+
+        repositoryList.appendChild(card);
+    });
+}
+
+function openRepositoryModal(repository) {
+    document.getElementById(
+        "modal-title"
+    ).textContent = repository.name;
+
+    document.getElementById(
+        "modal-description"
+    ).textContent = repository.description;
+
+    document.getElementById(
+        "modal-stars"
+    ).textContent = formatNumber(repository.stars);
+
+    document.getElementById(
+        "modal-forks"
+    ).textContent = formatNumber(repository.forks);
+
+    document.getElementById(
+        "modal-language"
+    ).textContent = repository.language;
+
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden", "false");
+
+    closeModalButton.focus();
+}
+
+function closeModal() {
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden", "true");
+}
+
+function startLoading() {
+    analyzeButton.disabled = true;
+    analyzeButton.textContent = "Analizando...";
+
+    loadingSection.classList.remove("hidden");
+    resultsSection.classList.add("hidden");
+
+    showStatus(
+        "Procesando los datos del perfil..."
+    );
+}
+
+function stopLoading() {
+    analyzeButton.disabled = false;
+    analyzeButton.textContent = "Analizar perfil";
+
+    loadingSection.classList.add("hidden");
+}
+
+function showStatus(message, isError = false) {
+    statusMessage.textContent = message;
+
+    statusMessage.classList.toggle(
+        "status-error",
+        isError
+    );
+}
+
+function calculateSeed(value) {
+    return value
+        .split("")
+        .reduce(function (total, character) {
+            return total + character.charCodeAt(0);
+        }, 0);
+}
+
+function formatUsername(username) {
+    return username
+        .split(/[-_.]/)
+        .filter(Boolean)
+        .map(function (word) {
+            return (
+                word.charAt(0).toUpperCase() +
+                word.slice(1)
+            );
+        })
+        .join(" ");
+}
+
+function getInitials(name) {
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(function (word) {
+            return word.charAt(0).toUpperCase();
+        })
+        .join("");
+}
+
+function formatNumber(number) {
+    return Number(number).toLocaleString("es-MX");
+}            throw new Error(
                 "GitHub no pudo responder. Intenta nuevamente."
             );
         }
