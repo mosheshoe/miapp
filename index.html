@@ -1,1 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Analiza perfiles públicos de GitHub y descubre sus principales indicadores."
+    >
+
+    <title>DevScope | GitHub Analytics</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">&lt;/&gt;</span>
+                DevScope
+            </a>
+
+            <nav>
+                <a href="#analizador">Analizador</a>
+                <a href="#resultados">KPIs</a>
+                <a href="#informacion">Información</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="badge">
+                    GitHub Data Analytics
+                </div>
+
+                <h1>
+                    Descubre el impacto de cualquier
+                    <span>perfil de GitHub</span>
+                </h1>
+
+                <p class="hero-description">
+                    Analiza repositorios públicos, estrellas, forks,
+                    lenguajes y actividad desde una sola plataforma.
+                </p>
+
+                <form id="github-form" class="search-box">
+
+                    <label for="username" class="sr-only">
+                        Usuario de GitHub
+                    </label>
+
+                    <div class="input-container">
+
+                        <span class="input-symbol">@</span>
+
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            placeholder="Escribe un usuario, por ejemplo: octocat"
+                            autocomplete="off"
+                            required
+                        >
+
+                    </div>
+
+                    <button id="search-button" type="submit">
+                        <span id="button-text">Analizar perfil</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+
+                </form>
+
+                <p id="status-message" class="status-message" role="status">
+                    Escribe un usuario público de GitHub para comenzar.
+                </p>
+
+            </div>
+
+            <div class="hero-decoration" aria-hidden="true">
+                <div class="code-window">
+
+                    <div class="window-header">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <div class="code-lines">
+                        <p><span class="purple">const</span> profile = {</p>
+                        <p>&nbsp;&nbsp;repositories: <span class="blue">42</span>,</p>
+                        <p>&nbsp;&nbsp;stars: <span class="blue">1,284</span>,</p>
+                        <p>&nbsp;&nbsp;language: <span class="green">"Python"</span></p>
+                        <p>};</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <section
+            id="loading-section"
+            class="loading-section hidden"
+            aria-live="polite"
+        >
+            <div class="loader"></div>
+            <p>Analizando los datos del perfil...</p>
+        </section>
+
+        <section
+            id="resultados"
+            class="results-section hidden"
+        >
+
+            <div class="section-container">
+
+                <div class="section-title">
+                    <div>
+                        <p class="section-label">Resultado del análisis</p>
+                        <h2>Resumen del perfil</h2>
+                    </div>
+
+                    <a
+                        id="github-profile-link"
+                        class="profile-link"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir en GitHub ↗
+                    </a>
+                </div>
+
+                <article class="profile-card">
+
+                    <img
+                        id="profile-avatar"
+                        class="profile-avatar"
+                        src=""
+                        alt="Avatar del perfil de GitHub"
+                    >
+
+                    <div class="profile-information">
+
+                        <h2 id="profile-name">
+                            Nombre del usuario
+                        </h2>
+
+                        <p id="profile-username" class="profile-username">
+                            @usuario
+                        </p>
+
+                        <p id="profile-bio" class="profile-bio">
+                            Información del perfil.
+                        </p>
+
+                        <div class="profile-details">
+
+                            <span id="profile-location">
+                                Ubicación no disponible
+                            </span>
+
+                            <span id="profile-company">
+                                Empresa no disponible
+                            </span>
+
+                            <span id="profile-created">
+                                Miembro desde:
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="social-stats">
+
+                        <div>
+                            <strong id="followers">0</strong>
+                            <span>Seguidores</span>
+                        </div>
+
+                        <div>
+                            <strong id="following">0</strong>
+                            <span>Siguiendo</span>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <div class="kpi-grid">
+
+                    <article class="kpi-card">
+                        <div class="kpi-icon">📁</div>
+                        <p class="kpi-label">Repositorios públicos</p>
+                        <p id="total-repositories" class="kpi-value">0</p>
+                        <p class="kpi-description">
+                            Proyectos disponibles
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <div class="kpi-icon">⭐</div>
+                        <p class="kpi-label">Total de estrellas</p>
+                        <p id="total-stars" class="kpi-value">0</p>
+                        <p class="kpi-description">
+                            Popularidad acumulada
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <div class="kpi-icon">⑂</div>
+                        <p class="kpi-label">Total de forks</p>
+                        <p id="total-forks" class="kpi-value">0</p>
+                        <p class="kpi-description">
+                            Copias y colaboraciones
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <div class="kpi-icon">Ø</div>
+                        <p class="kpi-label">Promedio de estrellas</p>
+                        <p id="average-stars" class="kpi-value">0</p>
+                        <p class="kpi-description">
+                            Estrellas por repositorio
+                        </p>
+                    </article>
+
+                </div>
+
+                <div class="insights-grid">
+
+                    <article class="insight-card featured-insight">
+                        <p class="section-label">
+                            Repositorio más popular
+                        </p>
+
+                        <h3 id="popular-repository">
+                            Sin información
+                        </h3>
+
+                        <p id="popular-repository-description">
+                            Aquí aparecerá el repositorio con más estrellas.
+                        </p>
+
+                        <a
+                            id="popular-repository-link"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Ver repositorio ↗
+                        </a>
+                    </article>
+
+                    <article class="insight-card">
+                        <p class="section-label">
+                            Lenguaje principal
+                        </p>
+
+                        <h3 id="main-language">
+                            Sin información
+                        </h3>
+
+                        <p>
+                            Lenguaje más utilizado en los repositorios públicos.
+                        </p>
+                    </article>
+
+                </div>
+
+                <section class="repositories-section">
+
+                    <div class="section-title">
+                        <div>
+                            <p class="section-label">Top projects</p>
+                            <h2>Repositorios destacados</h2>
+                        </div>
+                    </div>
+
+                    <div
+                        id="repository-list"
+                        class="repository-list"
+                    ></div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+        <section id="informacion" class="information-section">
+
+            <div class="section-container">
+
+                <div class="information-card">
+
+                    <p class="section-label">
+                        Data & Insights
+                    </p>
+
+                    <h2>
+                        ¿Cómo funciona esta aplicación?
+                    </h2>
+
+                    <p>
+                        DevScope obtiene información pública de GitHub,
+                        organiza los repositorios y calcula indicadores
+                        para mostrar rápidamente el impacto del perfil.
+                    </p>
+
+                    <div class="steps-grid">
+
+                        <div class="step">
+                            <span>01</span>
+                            <h3>Buscar</h3>
+                            <p>Escribe un usuario público de GitHub.</p>
+                        </div>
+
+                        <div class="step">
+                            <span>02</span>
+                            <h3>Analizar</h3>
+                            <p>La aplicación procesa sus repositorios.</p>
+                        </div>
+
+                        <div class="step">
+                            <span>03</span>
+                            <h3>Comprender</h3>
+                            <p>Consulta sus KPIs principales.</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <strong>DevScope</strong>
+            <p>Proyecto creado con GitHub, JavaScript y análisis de datos.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
