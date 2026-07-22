@@ -8,6 +8,11 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Analiza perfiles públicos de GitHub y consulta sus principales KPIs."
+    >
+
     <title>DevScope | GitHub Analytics</title>
 
     <link rel="stylesheet" href="style.css">
@@ -35,6 +40,403 @@
     <main>
 
         <section id="inicio" class="hero">
+
+            <div class="hero-content">
+
+                <span class="badge">
+                    GitHub Data Analytics
+                </span>
+
+                <h1>
+                    Descubre el impacto de cualquier
+                    <span>perfil de GitHub</span>
+                </h1>
+
+                <p class="hero-description">
+                    Consulta datos reales de GitHub y analiza repositorios,
+                    estrellas, forks, lenguajes y otros indicadores.
+                </p>
+
+                <a href="#analizador" class="primary-link">
+                    Analizar un perfil
+                </a>
+
+            </div>
+
+            <div class="code-window">
+
+                <div class="window-header">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="code-content">
+                    <p>
+                        <span class="purple">const</span>
+                        profile =
+                        <span class="green">"github"</span>;
+                    </p>
+
+                    <p>
+                        <span class="purple">const</span>
+                        data =
+                        <span class="blue">await</span>
+                        analyze(profile);
+                    </p>
+
+                    <p>
+                        <span class="purple">const</span>
+                        stars = data.total_stars;
+                    </p>
+
+                    <p>
+                        <span class="purple">const</span>
+                        language = data.main_language;
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="analizador" class="analyzer-section">
+
+            <div class="section-container">
+
+                <div class="section-heading">
+
+                    <span class="section-label">
+                        Analizador
+                    </span>
+
+                    <h2>Consulta un perfil público</h2>
+
+                    <p>
+                        Escribe el nombre exacto de un usuario de GitHub.
+                    </p>
+
+                </div>
+
+                <form id="github-form" class="search-card">
+
+                    <label for="username">
+                        Usuario de GitHub
+                    </label>
+
+                    <div class="search-row">
+
+                        <input
+                            id="username"
+                            name="username"
+                            type="text"
+                            placeholder="Ejemplo: octocat"
+                            autocomplete="off"
+                            required
+                        >
+
+                        <button
+                            id="analyze-button"
+                            type="submit"
+                        >
+                            Analizar perfil
+                        </button>
+
+                    </div>
+
+                    <p
+                        id="status-message"
+                        class="status-message"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Escribe un usuario para comenzar.
+                    </p>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <section
+            id="loading-section"
+            class="loading-section hidden"
+        >
+
+            <div class="loader"></div>
+
+            <p>
+                Consultando GitHub y procesando los datos con Pandas...
+            </p>
+
+        </section>
+
+        <section
+            id="resultados"
+            class="results-section hidden"
+        >
+
+            <div class="section-container">
+
+                <div class="results-heading">
+
+                    <div>
+                        <span class="section-label">
+                            Resultados
+                        </span>
+
+                        <h2>Resumen del perfil</h2>
+                    </div>
+
+                    <div class="results-actions">
+
+                        <a
+                            id="github-profile-link"
+                            class="github-link"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Abrir GitHub ↗
+                        </a>
+
+                        <button
+                            id="new-search-button"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Nueva búsqueda
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <article class="profile-card">
+
+                    <img
+                        id="profile-avatar"
+                        class="profile-avatar"
+                        src=""
+                        alt="Avatar del usuario de GitHub"
+                    >
+
+                    <div class="profile-information">
+
+                        <h3 id="profile-name">
+                            Nombre del usuario
+                        </h3>
+
+                        <p
+                            id="profile-username"
+                            class="profile-username"
+                        >
+                            @usuario
+                        </p>
+
+                        <p
+                            id="profile-bio"
+                            class="profile-bio"
+                        >
+                            Información del perfil.
+                        </p>
+
+                        <div class="profile-details">
+
+                            <span id="profile-location">
+                                Ubicación no disponible
+                            </span>
+
+                            <span id="profile-company">
+                                Empresa no disponible
+                            </span>
+
+                            <span id="profile-created">
+                                Miembro desde
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="social-stats">
+
+                        <div>
+                            <strong id="followers">0</strong>
+                            <span>Seguidores</span>
+                        </div>
+
+                        <div>
+                            <strong id="following">0</strong>
+                            <span>Siguiendo</span>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <div class="kpi-grid">
+
+                    <article class="kpi-card">
+                        <span class="kpi-icon">📁</span>
+
+                        <p class="kpi-label">
+                            Repositorios
+                        </p>
+
+                        <strong id="total-repositories">
+                            0
+                        </strong>
+
+                        <p class="kpi-description">
+                            Proyectos públicos analizados
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <span class="kpi-icon">⭐</span>
+
+                        <p class="kpi-label">
+                            Total de estrellas
+                        </p>
+
+                        <strong id="total-stars">
+                            0
+                        </strong>
+
+                        <p class="kpi-description">
+                            KPI principal de popularidad
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <span class="kpi-icon">⑂</span>
+
+                        <p class="kpi-label">
+                            Total de forks
+                        </p>
+
+                        <strong id="total-forks">
+                            0
+                        </strong>
+
+                        <p class="kpi-description">
+                            Copias de los proyectos
+                        </p>
+                    </article>
+
+                    <article class="kpi-card">
+                        <span class="kpi-icon">Ø</span>
+
+                        <p class="kpi-label">
+                            Promedio de estrellas
+                        </p>
+
+                        <strong id="average-stars">
+                            0
+                        </strong>
+
+                        <p class="kpi-description">
+                            Estrellas por repositorio
+                        </p>
+                    </article>
+
+                </div>
+
+                <div class="insights-grid">
+
+                    <article class="insight-card featured-insight">
+
+                        <span class="section-label">
+                            Repositorio más popular
+                        </span>
+
+                        <h3 id="popular-repository">
+                            Sin información
+                        </h3>
+
+                        <p id="popular-description">
+                            Aquí aparecerá el repositorio con más estrellas.
+                        </p>
+
+                        <a
+                            id="popular-repository-link"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Ver repositorio ↗
+                        </a>
+
+                    </article>
+
+                    <article class="insight-card">
+
+                        <span class="section-label">
+                            Lenguaje principal
+                        </span>
+
+                        <h3 id="main-language">
+                            Sin información
+                        </h3>
+
+                        <p>
+                            Lenguaje más frecuente entre los repositorios.
+                        </p>
+
+                    </article>
+
+                </div>
+
+                <section class="repositories-section">
+
+                    <div class="section-heading">
+
+                        <span class="section-label">
+                            Proyectos destacados
+                        </span>
+
+                        <h2>Top repositorios</h2>
+
+                        <p>
+                            Repositorios ordenados de mayor a menor
+                            número de estrellas.
+                        </p>
+
+                    </div>
+
+                    <div
+                        id="repository-list"
+                        class="repository-list"
+                    ></div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <div class="footer-container">
+
+            <strong>DevScope</strong>
+
+            <p>
+                GitHub API · Python · Pandas · JavaScript
+            </p>
+
+        </div>
+
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>        <section id="inicio" class="hero">
 
             <div class="hero-content">
 
